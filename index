@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnlyEV - Used Clean Vehicle Tax Credit Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Seller Section */
+        .seller-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .seller-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .seller-section p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .vin-input-group {
+            display: flex;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto 10px;
+        }
+
+        .vin-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            text-transform: uppercase;
+        }
+
+        .vin-input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .copy-link-btn {
+            padding: 12px 24px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-link-btn:hover {
+            background: #333;
+        }
+
+        .copy-link-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .help-text {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .share-link-display {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+        }
+
+        .share-link-display.active {
+            display: block;
+        }
+
+        .share-link {
+            word-break: break-all;
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            position: relative;
+            color: #888;
+            font-weight: 500;
+        }
+
+        /* Eligibility Checker */
+        .eligibility-section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .eligibility-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .eligibility-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .eligibility-header p {
+            color: #666;
+        }
+
+        /* Steps */
+        .step {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #f0f0f0;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step.completed {
+            opacity: 0.7;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+            margin-right: 12px;
+        }
+
+        .step.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .step-content {
+            margin-left: 44px;
+        }
+
+        .step-question {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .option-btn:hover {
+            border-color: #999;
+            background: #f8f9fa;
+        }
+
+        .option-btn.selected {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .input-field {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        select.input-field {
+            cursor: pointer;
+        }
+
+        .next-btn {
+            padding: 12px 30px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .next-btn:hover {
+            background: #333;
+        }
+
+        .next-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .results {
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results.eligible {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .results.not-eligible {
+            background: #ffebee;
+            border: 2px solid #f44336;
+        }
+
+        .results.maybe-eligible {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+
+        .results-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .results-details {
+            margin-bottom: 20px;
+        }
+
+        .results-item {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .check-icon {
+            color: #4caf50;
+            margin-right: 10px;
+        }
+
+        .x-icon {
+            color: #f44336;
+            margin-right: 10px;
+        }
+
+        .warning-icon {
+            color: #ff9800;
+            margin-right: 10px;
+        }
+
+        .credit-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4caf50;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .disclaimer {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .reset-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            border-color: #999;
+            background: #f8f9fa;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a1a1a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        .spinner.show {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 30px 0;
+            }
+
+            .logo {
+                font-size: 2em;
+            }
+
+            .vin-input-group {
+                flex-direction: column;
+            }
+
+            .copy-link-btn {
+                width: 100%;
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚡ OnlyEV</div>
+            <div class="tagline">Used Clean Vehicle Tax Credit Eligibility Checker</div>
+        </div>
+
+        <!-- Seller Section -->
+        <div class="seller-section">
+            <h2>Selling an EV?</h2>
+            <p>Help buyers check their eligibility by adding this link to your ad.</p>
+            <div class="vin-input-group">
+                <input type="text" 
+                       class="vin-input" 
+                       id="sellerVin" 
+                       placeholder="VIN (optional)" 
+                       maxlength="17"
+                       oninput="this.value = this.value.toUpperCase()">
+                <button class="copy-link-btn" onclick="generateShareLink()">
+                    <span>📋</span> Copy link
+                </button>
+            </div>
+            <div class="help-text">Including your VIN makes it easier for buyers.</div>
+            <div class="share-link-display" id="shareLinkDisplay">
+                <strong>Share this link:</strong><br>
+                <a href="#" class="share-link" id="shareLink" target="_blank"></a>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <!-- Eligibility Checker -->
+        <div class="eligibility-section">
+            <div class="eligibility-header">
+                <h2>Check your eligibility</h2>
+                <p>We'll ask you about the buyer, seller, and vehicle. Your answers help us determine if your transaction qualifies for the used EV tax credit.</p>
+            </div>
+
+            <!-- Step 1: Price -->
+            <div class="step active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Price</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-question">What's the sale price of the vehicle, before tax?</div>
+                    <div class="button-group">
+                        <button class="option-btn" onclick="selectPrice('25000')">$25,000 or less</button>
+                        <button class="option-btn" onclick="selectPrice('more')">More than $25,000</button>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <input type="number" 
+                               class="input-field" 
+                               id="priceInput" 
+                               placeholder="Enter exact amount"
+                               onchange="updatePrice()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Vehicle -->
+            <div class="step" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Vehicle</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-question">Enter the vehicle's VIN or select details manually</div>
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" 
+                               class="input-field" 
+                               id="vinInput" 
+                               placeholder="17-character VIN"
+                               maxlength="17"
+                               style="max-width: 400px;"
+                               oninput="this.value = this.value.toUpperCase()">
+                        <button class="option-btn" onclick="decodeVIN()" style="margin-left: 10px;">Decode VIN</button>
+                    </div>
+                    <div class="divider" style="margin: 20px 0;">
+                        <span>or enter manually</span>
+                    </div>
+                    <div style="display: grid; gap: 10px; max-width: 400px;">
+                        <select class="input-field" id="yearSelect" onchange="updateVehicle()">
+                            <option value="">Select Year</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="older">Older than 2015</option>
+                        </select>
+                        <input type="text" class="input-field" id="makeInput" placeholder="Make (e.g., Tesla)" onchange="updateVehicle()">
+                        <input type="text" class="input-field" id="modelInput" placeholder="Model (e.g., Model 3)" onchange="updateVehicle()">
+                    </div>
+                    <div class="spinner" id="vinSpinner"></div>
+                    <div id="vehicleInfo" style="margin-top: 15px; display: none;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <strong>Vehicle Details:</strong>
+                            <div id="vehicleDetails"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Buyer -->
+            <div class="step" id="step3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Buyer</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-question">What is the buyer's tax filing status and income?</div>
+                    <div style="margin-bottom: 15px;">
+                        <select class="input-field" id="filingStatus" onchange="updateBuyer()">
+                            <option value="">Select Filing Status</option>
+                            <option value="single">Single</option>
+                            <option value="joint">Married Filing Jointly</option>
+                            <option value="head">Head of Household</option>
+                        </select>
+                    </div>
+                    <div id="incomeThreshold" style="display: none; margin-bottom: 15px;">
+                        <div style="color: #666; margin-bottom: 10px;">Income limit: <span id="incomeLimit"></span></div>
+                        <div class="button-group">
+                            <button class="option-btn" onclick="selectIncome('under')">Under the limit</button>
+                            <button class="option-btn" onclick="selectIncome('over')">Over the limit</button>
+                        </div>
+                    </div>
+                    <div class="step-question" style="margin-top: 20px;">Has the buyer claimed this credit in the past 3 years?</div>
+                    <div class="button-group">
+                        <button class="option-btn" onclick="selectPreviousClaim('no')">No</button>
+                        <button class="option-btn" onclick="selectPreviousClaim('yes')">Yes</button>
+                        <button class="option-btn" onclick="selectPreviousClaim('unsure')">Not sure</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Seller -->
+            <div class="step" id="step4">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Seller</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-question">Who is selling the vehicle?</div>
+                    <div class="button-group">
+                        <button class="option-btn" onclick="selectSeller('dealer')">Licensed Dealer</button>
+                        <button class="option-btn" onclick="selectSeller('private')">Private Party</button>
+                    </div>
+                    <div id="dealerInfo" style="display: none; margin-top: 15px;">
+                        <div class="step-question">Is the dealer registered with the IRS for clean vehicle credits?</div>
+                        <div class="button-group">
+                            <button class="option-btn" onclick="selectDealerRegistered('yes')">Yes</button>
+                            <button class="option-btn" onclick="selectDealerRegistered('no')">No</button>
+                            <button class="option-btn" onclick="selectDealerRegistered('unsure')">Not sure</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Sale Type -->
+            <div class="step" id="step5">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Sale Type</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-question">Is this the first time this vehicle is being sold as used since August 16, 2022?</div>
+                    <div class="button-group">
+                        <button class="option-btn" onclick="selectFirstTransfer('yes')">Yes (first used sale)</button>
+                        <button class="option-btn" onclick="selectFirstTransfer('no')">No (sold used before)</button>
+                        <button class="option-btn" onclick="selectFirstTransfer('unsure')">Not sure</button>
+                    </div>
+                    <div style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                        💡 Check the vehicle history report (Carfax, AutoCheck) to verify transfer history.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Results -->
+            <div class="step" id="step6">
+                <div class="step-header">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Results</div>
+                </div>
+                <div class="step-content">
+                    <button class="next-btn" onclick="calculateResults()">Calculate Eligibility</button>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="results" id="results">
+                <div class="results-header">
+                    <div class="results-icon" id="resultsIcon"></div>
+                    <div class="results-title" id="resultsTitle"></div>
+                </div>
+                <div class="results-details" id="resultsDetails"></div>
+                <div class="credit-amount" id="creditAmount"></div>
+                <div class="disclaimer">
+                    <strong>Disclaimer:</strong> This tool provides general guidance based on IRS Publication 5866-A. 
+                    Always consult with a tax professional and verify eligibility at 
+                    <a href="https://fueleconomy.gov/feg/tax2023.shtml" target="_blank">FuelEconomy.gov</a>. 
+                    Final eligibility is determined by the IRS.
+                </div>
+                <button class="reset-btn" onclick="resetChecker()">Start Over</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">Link copied to clipboard!</div>
+
+    <script>
+        // Data storage
+        let checkData = {
+            price: null,
+            vehicle: {
+                vin: null,
+                year: null,
+                make: null,
+                model: null,
+                type: null,
+                weight: null,
+                battery: null
+            },
+            buyer: {
+                filingStatus: null,
+                income: null,
+                previousClaim: null
+            },
+            seller: {
+                type: null,
+                registered: null
+            },
+            firstTransfer: null
+        };
+
+        // Known EV models database
+        const evModels = {
+            'tesla model 3': { battery: 50, type: 'BEV' },
+            'tesla model y': { battery: 75, type: 'BEV' },
+            'tesla model s': { battery: 75, type: 'BEV' },
+            'tesla model x': { battery: 75, type: 'BEV' },
+            'chevrolet bolt': { battery: 60, type: 'BEV' },
+            'chevrolet bolt euv': { battery: 65, type: 'BEV' },
+            'nissan leaf': { battery: 40, type: 'BEV' },
+            'ford mustang mach-e': { battery: 68, type: 'BEV' },
+            'volkswagen id.4': { battery: 77, type: 'BEV' },
+            'hyundai ioniq 5': { battery: 58, type: 'BEV' },
+            'kia ev6': { battery: 58, type: 'BEV' },
+            'bmw i3': { battery: 42, type: 'BEV' },
+            'audi e-tron': { battery: 71, type: 'BEV' },
+            'porsche taycan': { battery: 71, type: 'BEV' },
+            'toyota prius prime': { battery: 8.8, type: 'PHEV' },
+            'chrysler pacifica hybrid': { battery: 16, type: 'PHEV' },
+            'bmw 330e': { battery: 12, type: 'PHEV' },
+            'volvo xc90 recharge': { battery: 11.6, type: 'PHEV' }
+        };
+
+        // Initialize from URL params if present
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const vin = urlParams.get('vin');
+            if (vin) {
+                document.getElementById('vinInput').value = vin;
+                // Auto-decode VIN if provided
+                setTimeout(() => decodeVIN(), 500);
+            }
+        };
+
+        // Generate shareable link
+        function generateShareLink() {
+            const vin = document.getElementById('sellerVin').value;
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = vin ? `${baseUrl}?vin=${vin}` : baseUrl;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Link copied to clipboard!');
+                
+                // Show the link
+                const linkDisplay = document.getElementById('shareLinkDisplay');
+                const linkElement = document.getElementById('shareLink');
+                linkElement.href = shareUrl;
+                linkElement.textContent = shareUrl;
+                linkDisplay.classList.add('active');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Step 1: Price
+        function selectPrice(option) {
+            const buttons = document.querySelectorAll('#step1 .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            if (option === '25000') {
+                checkData.price = 25000;
+                document.getElementById('priceInput').value = '25000';
+            } else {
+                document.getElementById('priceInput').focus();
+            }
+            
+            activateNextStep(2);
+        }
+
+        function updatePrice() {
+            const price = parseFloat(document.getElementById('priceInput').value);
+            if (price) {
+                checkData.price = price;
+                activateNextStep(2);
+            }
+        }
+
+        // Step 2: Vehicle
+        async function decodeVIN() {
+            const vin = document.getElementById('vinInput').value.trim();
+            
+            if (vin.length !== 17) {
+                showToast('Please enter a valid 17-character VIN');
+                return;
+            }
+            
+            const spinner = document.getElementById('vinSpinner');
+            spinner.classList.add('show');
+            
+            try {
+                const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`);
+                const data = await response.json();
+                
+                if (data.Results) {
+                    const vehicleInfo = {};
+                    data.Results.forEach(item => {
+                        if (item.Value && item.Value !== 'Not Applicable') {
+                            vehicleInfo[item.Variable] = item.Value;
+                        }
+                    });
+                    
+                    // Update vehicle data
+                    checkData.vehicle.vin = vin;
+                    checkData.vehicle.year = parseInt(vehicleInfo['Model Year']) || null;
+                    checkData.vehicle.make = vehicleInfo['Make'] || '';
+                    checkData.vehicle.model = vehicleInfo['Model'] || '';
+                    checkData.vehicle.type = vehicleInfo['Electrification Level'] || vehicleInfo['Fuel Type - Primary'] || '';
+                    checkData.vehicle.weight = vehicleInfo['Gross Vehicle Weight Rating From'] || '';
+                    
+                    // Update UI
+                    document.getElementById('yearSelect').value = checkData.vehicle.year || '';
+                    document.getElementById('makeInput').value = checkData.vehicle.make;
+                    document.getElementById('modelInput').value = checkData.vehicle.model;
+                    
+                    // Show vehicle info
+                    const infoDiv = document.getElementById('vehicleInfo');
+                    const detailsDiv = document.getElementById('vehicleDetails');
+                    detailsDiv.innerHTML = `
+                        <div>Year: ${checkData.vehicle.year}</div>
+                        <div>Make: ${checkData.vehicle.make}</div>
+                        <div>Model: ${checkData.vehicle.model}</div>
+                        ${checkData.vehicle.type ? `<div>Type: ${checkData.vehicle.type}</div>` : ''}
+                        ${checkData.vehicle.weight ? `<div>GVWR: ${checkData.vehicle.weight} lbs</div>` : ''}
+                    `;
+                    infoDiv.style.display = 'block';
+                    
+                    // Check if it's a known EV model
+                    const modelKey = `${checkData.vehicle.make.toLowerCase()} ${checkData.vehicle.model.toLowerCase()}`;
+                    const knownEV = evModels[Object.keys(evModels).find(key => modelKey.includes(key))];
+                    if (knownEV) {
+                        checkData.vehicle.battery = knownEV.battery;
+                        detailsDiv.innerHTML += `<div>Battery: ${knownEV.battery} kWh (typical)</div>`;
+                    }
+                    
+                    activateNextStep(3);
+                }
+            } catch (error) {
+                showToast('Error decoding VIN. Please enter details manually.');
+                console.error('VIN decode error:', error);
+            } finally {
+                spinner.classList.remove('show');
+            }
+        }
+
+        function updateVehicle() {
+            const year = document.getElementById('yearSelect').value;
+            const make = document.getElementById('makeInput').value;
+            const model = document.getElementById('modelInput').value;
+            
+            if (year && make && model) {
+                checkData.vehicle.year = year === 'older' ? 2014 : parseInt(year);
+                checkData.vehicle.make = make;
+                checkData.vehicle.model = model;
+                
+                // Check if it's a known EV
+                const modelKey = `${make.toLowerCase()} ${model.toLowerCase()}`;
+                const knownEV = evModels[Object.keys(evModels).find(key => modelKey.includes(key))];
+                if (knownEV) {
+                    checkData.vehicle.battery = knownEV.battery;
+                    checkData.vehicle.type = knownEV.type;
+                }
+                
+                activateNextStep(3);
+            }
+        }
+
+        // Step 3: Buyer
+        function updateBuyer() {
+            const status = document.getElementById('filingStatus').value;
+            if (status) {
+                checkData.buyer.filingStatus = status;
+                
+                const limits = {
+                    'single': '$75,000',
+                    'joint': '$150,000',
+                    'head': '$112,500'
+                };
+                
+                document.getElementById('incomeLimit').textContent = limits[status];
+                document.getElementById('incomeThreshold').style.display = 'block';
+            }
+        }
+
+        function selectIncome(option) {
+            const buttons = document.querySelectorAll('#incomeThreshold .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            checkData.buyer.income = option;
+            
+            if (checkData.buyer.previousClaim !== null) {
+                activateNextStep(4);
+            }
+        }
+
+        function selectPreviousClaim(option) {
+            const buttons = event.target.parentElement.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            checkData.buyer.previousClaim = option;
+            
+            if (checkData.buyer.income) {
+                activateNextStep(4);
+            }
+        }
+
+        // Step 4: Seller
+        function selectSeller(type) {
+            const buttons = document.querySelectorAll('#step4 .button-group')[0].querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            checkData.seller.type = type;
+            
+            if (type === 'dealer') {
+                document.getElementById('dealerInfo').style.display = 'block';
+            } else {
+                document.getElementById('dealerInfo').style.display = 'none';
+                checkData.seller.registered = null;
+                activateNextStep(5);
+            }
+        }
+
+        function selectDealerRegistered(option) {
+            const buttons = document.getElementById('dealerInfo').querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            checkData.seller.registered = option;
+            activateNextStep(5);
+        }
+
+        // Step 5: Sale Type
+        function selectFirstTransfer(option) {
+            const buttons = document.querySelectorAll('#step5 .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            checkData.firstTransfer = option;
+            activateNextStep(6);
+        }
+
+        // Calculate and show results
+        function calculateResults() {
+            const results = document.getElementById('results');
+            const resultsIcon = document.getElementById('resultsIcon');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const resultsDetails = document.getElementById('resultsDetails');
+            const creditAmount = document.getElementById('creditAmount');
+            
+            let eligible = true;
+            let warnings = [];
+            let failures = [];
+            let successes = [];
+            
+            // Check price
+            if (checkData.price > 25000) {
+                failures.push('❌ Sale price exceeds $25,000 limit');
+                eligible = false;
+            } else {
+                successes.push('✅ Sale price is $25,000 or less');
+            }
+            
+            // Check vehicle age
+            const currentYear = 2025;
+            const vehicleAge = currentYear - checkData.vehicle.year;
+            if (vehicleAge < 2) {
+                failures.push('❌ Vehicle is less than 2 years old');
+                eligible = false;
+            } else {
+                successes.push('✅ Vehicle is at least 2 years old');
+            }
+            
+            // Check vehicle type
+            if (checkData.vehicle.type && 
+                (checkData.vehicle.type.toLowerCase().includes('electric') || 
+                 checkData.vehicle.type.toLowerCase().includes('plug-in') ||
+                 checkData.vehicle.type.toLowerCase().includes('fuel cell'))) {
+                successes.push('✅ Vehicle appears to be an EV/PHEV/Fuel Cell');
+            } else if (checkData.vehicle.battery && checkData.vehicle.battery >= 7) {
+                successes.push('✅ Vehicle has adequate battery capacity');
+            } else {
+                warnings.push('⚠️ Verify vehicle is an EV/PHEV/Fuel Cell with ≥7 kWh battery');
+            }
+            
+            // Check buyer income
+            if (checkData.buyer.income === 'over') {
+                failures.push('❌ Buyer income exceeds limit');
+                eligible = false;
+            } else {
+                successes.push('✅ Buyer meets income requirements');
+            }
+            
+            // Check previous claim
+            if (checkData.buyer.previousClaim === 'yes') {
+                failures.push('❌ Buyer has claimed credit in past 3 years');
+                eligible = false;
+            } else if (checkData.buyer.previousClaim === 'unsure') {
+                warnings.push('⚠️ Verify buyer hasn\'t claimed credit in past 3 years');
+            } else {
+                successes.push('✅ Buyer hasn\'t claimed credit recently');
+            }
+            
+            // Check seller
+            if (checkData.seller.type === 'private') {
+                failures.push('❌ Private party sales don\'t qualify');
+                eligible = false;
+            } else if (checkData.seller.registered === 'no') {
+                failures.push('❌ Dealer not registered with IRS');
+                eligible = false;
+            } else if (checkData.seller.registered === 'unsure') {
+                warnings.push('⚠️ Verify dealer is IRS-registered');
+            } else {
+                successes.push('✅ Licensed dealer sale');
+            }
+            
+            // Check first transfer
+            if (checkData.firstTransfer === 'no') {
+                failures.push('❌ Not first transfer since Aug 16, 2022');
+                eligible = false;
+            } else if (checkData.firstTransfer === 'unsure') {
+                warnings.push('⚠️ Verify first transfer status with vehicle history report');
+            } else {
+                successes.push('✅ First transfer since Aug 16, 2022');
+            }
+            
+            // Determine overall eligibility
+            let resultClass, iconText, titleText, amountText;
+            
+            if (!eligible) {
+                resultClass = 'not-eligible';
+                iconText = '❌';
+                titleText = 'Not Eligible';
+                amountText = '';
+            } else if (warnings.length > 0) {
+                resultClass = 'maybe-eligible';
+                iconText = '⚠️';
+                titleText = 'Potentially Eligible';
+                const creditCalc = Math.min(4000, checkData.price * 0.3);
+                amountText = `Potential Credit: $${creditCalc.toLocaleString()}`;
+            } else {
+                resultClass = 'eligible';
+                iconText = '✅';
+                titleText = 'Likely Eligible!';
+                const creditCalc = Math.min(4000, checkData.price * 0.3);
+                amountText = `Estimated Credit: $${creditCalc.toLocaleString()}`;
+            }
+            
+            // Build details HTML
+            let detailsHTML = '';
+            
+            if (successes.length > 0) {
+                detailsHTML += '<div style="margin-bottom: 15px;"><strong>Requirements Met:</strong></div>';
+                successes.forEach(item => {
+                    detailsHTML += `<div class="results-item">${item}</div>`;
+                });
+            }
+            
+            if (failures.length > 0) {
+                detailsHTML += '<div style="margin-bottom: 15px; margin-top: 20px;"><strong>Issues Found:</strong></div>';
+                failures.forEach(item => {
+                    detailsHTML += `<div class="results-item">${item}</div>`;
+                });
+            }
+            
+            if (warnings.length > 0) {
+                detailsHTML += '<div style="margin-bottom: 15px; margin-top: 20px;"><strong>Items to Verify:</strong></div>';
+                warnings.forEach(item => {
+                    detailsHTML += `<div class="results-item">${item}</div>`;
+                });
+            }
+            
+            // Update results display
+            results.className = `results show ${resultClass}`;
+            resultsIcon.textContent = iconText;
+            resultsTitle.textContent = titleText;
+            resultsDetails.innerHTML = detailsHTML;
+            creditAmount.textContent = amountText;
+            
+            // Mark step 6 as completed
+            document.getElementById('step6').classList.add('completed');
+            
+            // Scroll to results
+            results.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Activate next step
+        function activateNextStep(stepNumber) {
+            // Mark current step as completed
+            for (let i = 1; i < stepNumber; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+                document.getElementById(`step${i}`).classList.add('completed');
+            }
+            
+            // Activate next step
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            
+            // Scroll to next step
+            document.getElementById(`step${stepNumber}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Reset checker
+        function resetChecker() {
+            // Reset data
+            checkData = {
+                price: null,
+                vehicle: {
+                    vin: null,
+                    year: null,
+                    make: null,
+                    model: null,
+                    type: null,
+                    weight: null,
+                    battery: null
+                },
+                buyer: {
+                    filingStatus: null,
+                    income: null,
+                    previousClaim: null
+                },
+                seller: {
+                    type: null,
+                    registered: null
+                },
+                firstTransfer: null
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            document.getElementById('step1').classList.add('active');
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.value = '';
+            });
+            
+            document.getElementById('vehicleInfo').style.display = 'none';
+            document.getElementById('incomeThreshold').style.display = 'none';
+            document.getElementById('dealerInfo').style.display = 'none';
+            document.getElementById('results').classList.remove('show');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
